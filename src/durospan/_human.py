@@ -32,7 +32,7 @@ GRAMMAR = Grammar(
     ambiguous=AMBIGUOUS,
 )
 
-_CLOCK = re.compile(r"(\d+):([0-5]\d)(?::([0-5]\d))?(?:\.(\d+))?")
+_CLOCK = re.compile(r"([0-9]+):([0-5][0-9])(?::([0-5][0-9]))?(?:\.([0-9]+))?")
 
 _OUTPUT = (
     ("w", WEEK),

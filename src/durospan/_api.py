@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import timedelta
+from datetime import date, timedelta
 from decimal import Decimal
 from typing import Literal, get_args
 
@@ -42,7 +42,8 @@ def parse_ns(text: str, *, dialect: Dialect = "human", reference: Reference | No
     """Parse ``text`` in ``dialect`` into an exact integer number of nanoseconds.
 
     ``reference`` (a ``date`` or ``datetime``) resolves ISO 8601 years and months on the
-    calendar; without it they raise :class:`AmbiguousDurationError`. Fractions finer than
+    calendar; without it they raise :class:`AmbiguousDurationError`. Other dialects have
+    no calendar units and ignore it. Fractions finer than
     a nanosecond truncate toward zero, as in Go.
 
     >>> parse_ns("1h30m", dialect="go")
@@ -57,6 +58,8 @@ def parse_ns(text: str, *, dialect: Dialect = "human", reference: Reference | No
     _check_dialect(dialect)
     if not isinstance(text, str):
         raise DurationError(f"expected text, got {type(text).__name__}")
+    if reference is not None and not isinstance(reference, date):
+        raise DurationError(f"reference must be a date or datetime, got {reference!r}")
     check_length(text)
     if dialect == "go":
         return _go.parse(text)
@@ -88,7 +91,8 @@ def format_duration(value: int | timedelta, *, dialect: Dialect = "human") -> st
     """Render ``value`` (integer nanoseconds or a ``timedelta``) canonically in ``dialect``.
 
     Each dialect writes the form its reference tool writes, and parsing the result in
-    the same dialect gives the exact value back.
+    the same dialect gives the exact value back. Values must fit the dialect's range:
+    int64 nanoseconds for go and prometheus, the ``timedelta`` range for the others.
 
     >>> format_duration(5_400_000_000_000, dialect="go")
     '1h30m0s'
@@ -101,6 +105,8 @@ def format_duration(value: int | timedelta, *, dialect: Dialect = "human") -> st
     ns = _as_ns(value)
     if dialect in ("go", "prometheus"):
         check_range(ns, str(value), INT64_MIN, INT64_MAX)
+    else:
+        check_timedelta_range(ns, str(value))
     return _FORMATTERS[dialect](ns)
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import date, timedelta
 
 import pytest
 
@@ -95,3 +95,48 @@ def test_format_duration_rejects_floats_and_bools() -> None:
     for value in (1.5, True):
         with pytest.raises(durospan.DurationError):
             durospan.format_duration(value)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ("text", "dialect"),
+    [
+        ("\u0661s", "prometheus"),
+        ("PT\u0661S", "iso8601"),
+        ("\u0661 s", "systemd"),
+        ("\u0661:30", "human"),
+        ("\u0661h", "human"),
+        ("\u0661s", "go"),
+    ],
+)
+def test_only_ascii_digits_are_numbers(text: str, dialect: durospan.Dialect) -> None:
+    with pytest.raises(durospan.DurationSyntaxError):
+        durospan.parse_ns(text, dialect=dialect)
+
+
+def test_non_ascii_digits_are_not_found_in_text() -> None:
+    assert durospan.find_durations("wait \u0661\u0662 minutes") == []
+
+
+def test_calendar_overflow_is_a_range_error() -> None:
+    with pytest.raises(durospan.DurationRangeError):
+        durospan.parse_ns("P1Y", dialect="iso8601", reference=date(9999, 6, 1))
+
+
+def test_a_reference_that_is_not_a_date_is_rejected() -> None:
+    with pytest.raises(durospan.DurationError):
+        durospan.parse_ns("P1M", dialect="iso8601", reference="2024-01-01")  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("dialect", ["human", "iso8601", "systemd"])
+def test_formatting_beyond_the_parse_range_is_refused(dialect: durospan.Dialect) -> None:
+    with pytest.raises(durospan.DurationRangeError):
+        durospan.format_duration(10**23, dialect=dialect)
+
+
+def test_find_rejects_non_text() -> None:
+    with pytest.raises(durospan.DurationError):
+        durospan.find_durations(None)  # type: ignore[arg-type]
+
+
+def test_duration_error_can_still_be_raised_bare() -> None:
+    assert str(durospan.DurationError()) == ""

@@ -24,7 +24,7 @@ _UNITS: tuple[tuple[str, int], ...] = (
     ("s", SECOND),
     ("ms", MS),
 )
-_PATTERN = re.compile("".join(rf"(?:(\d+){symbol})?" for symbol, _ in _UNITS))
+_PATTERN = re.compile("".join(rf"(?:([0-9]+){symbol})?" for symbol, _ in _UNITS))
 _SIZE = dict(_UNITS)
 
 
@@ -48,7 +48,7 @@ def parse(text: str) -> int:
 
 def _locate(text: str) -> DurationSyntaxError:
     pos, last = 0, -1
-    for match in re.finditer(r"(\d+)([a-z]*)|.", text):
+    for match in re.finditer(r"([0-9]+)([a-z]*)|.", text):
         if match.start() != pos or match.group(1) is None:
             return syntax_error("expected a whole number and a unit", text, pos, text[pos])
         unit = match.group(2)

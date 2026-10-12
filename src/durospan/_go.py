@@ -22,6 +22,7 @@ UNITS: dict[str, int] = {
 }
 
 _TOP = 1 << 63
+_MASK = (1 << 64) - 1
 
 
 def _invalid(text: str, position: int = 0, token: str = "") -> DurationSyntaxError:
@@ -107,7 +108,8 @@ def parse(text: str) -> int:
             whole += int(float(fraction) * (float(unit) / scale))
             if whole > _TOP:
                 raise _overflow(text)
-        total += whole
+        # Go adds in uint64, so 2**63 + 2**63 wraps to 0 and is accepted there too.
+        total = (total + whole) & _MASK
         if total > _TOP:
             raise _overflow(text)
     if negative:

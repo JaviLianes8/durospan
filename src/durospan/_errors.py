@@ -14,7 +14,7 @@ class DurationError(ValueError):
 
     def __init__(
         self,
-        message: str,
+        message: str = "",
         *,
         text: str | None = None,
         position: int | None = None,

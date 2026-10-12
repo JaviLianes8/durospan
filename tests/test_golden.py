@@ -102,3 +102,8 @@ def test_prometheus_rejects_what_prometheus_rejects(text: str) -> None:
 )
 def test_human_reads_what_people_type(text: str, dialect: durospan.Dialect, ns: int) -> None:
     assert durospan.parse_ns(text, dialect=dialect) == ns
+
+
+def test_go_uint64_wraparound_is_reproduced() -> None:
+    # Go sums tokens in uint64: 2**63 + 2**63 wraps to 0 and ParseDuration returns 0.
+    assert durospan.parse_ns("9223372036854775808ns9223372036854775808ns", dialect="go") == 0

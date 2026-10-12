@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from ._errors import AmbiguousDurationError, syntax_error
 from ._numbers import SECOND, scaled
 
-_TOKEN = re.compile(r"(\d+(?:\.\d+)?|\.\d+)[ \t]*([^\W\d_]+)?")
+_TOKEN = re.compile(r"([0-9]+(?:\.[0-9]+)?|\.[0-9]+)[ \t]*([^\W\d_]+)?")
 _SPACES = re.compile(r"\s*")
 _HUMAN_SEP = re.compile(r"\s*(?:,\s*(?:and\s+)?|and\s+)?", re.IGNORECASE)
 

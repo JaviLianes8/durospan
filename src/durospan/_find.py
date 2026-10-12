@@ -22,7 +22,7 @@ class DurationMatch:
     ns: int
 
 
-_NUMBER = r"(?:\d+(?:\.\d+)?|\.\d+)"
+_NUMBER = r"(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)"
 _LEFT = r"(?<![\w.])"
 _RIGHT = r"(?![\w.])"
 
@@ -36,10 +36,10 @@ def _token_pattern(grammar: Grammar, separator: str, flags: int) -> re.Pattern[s
 
 _PATTERNS: dict[str, re.Pattern[str]] = {
     "go": re.compile(
-        rf"(?<![\w.+-])[-+]?(?:(?:\d+(?:\.\d*)?|\.\d+)(?:ns|us|µs|μs|ms|h|m|s))+{_RIGHT}"
+        rf"(?<![\w.+-])[-+]?(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:ns|us|µs|μs|ms|h|m|s))+{_RIGHT}"
     ),
-    "prometheus": re.compile(rf"{_LEFT}(?:\d+(?:ms|y|w|d|h|m|s))+{_RIGHT}"),
-    "iso8601": re.compile(rf"(?<![\w.+-])[-+]?P(?:T|\d+(?:[.,]\d+)?[YMWDHS])+{_RIGHT}"),
+    "prometheus": re.compile(rf"{_LEFT}(?:[0-9]+(?:ms|y|w|d|h|m|s))+{_RIGHT}"),
+    "iso8601": re.compile(rf"(?<![\w.+-])[-+]?P(?:T|[0-9]+(?:[.,][0-9]+)?[YMWDHS])+{_RIGHT}"),
     "systemd": _token_pattern(_systemd.GRAMMAR, r"[ \t]*", 0),
     "human": _token_pattern(
         _human.GRAMMAR, r"(?:\s*,\s*(?:and\s+)?|\s+and\s+|[ \t]*)", re.IGNORECASE
@@ -54,7 +54,8 @@ def find_durations(
 
     Candidates that look like a duration but fail the full parser (a repeated unit, an
     ambiguous month without ``reference``) are skipped rather than guessed. Clock text
-    such as ``10:30`` is not reported, since in prose it is usually a time of day.
+    such as ``10:30`` is not reported, since in prose it is usually a time of day, and
+    in the systemd dialect every token needs a unit (a bare ``90`` is not reported).
 
     >>> [m.text for m in find_durations("retry in 5 minutes, give up after 2 h 30 min")]
     ['5 minutes', '2 h 30 min']
@@ -62,6 +63,8 @@ def find_durations(
     90000000000
     """
     _check_dialect(dialect)
+    if not isinstance(text, str):
+        raise DurationError(f"expected text, got {type(text).__name__}")
     found = []
     for match in _PATTERNS[dialect].finditer(text):
         candidate = match.group(0)

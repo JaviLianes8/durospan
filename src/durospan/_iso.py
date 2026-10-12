@@ -11,12 +11,12 @@ import calendar
 import re
 from datetime import date, datetime
 
-from ._errors import AmbiguousDurationError, DurationSyntaxError, syntax_error
+from ._errors import AmbiguousDurationError, DurationRangeError, DurationSyntaxError, syntax_error
 from ._numbers import DAY, HOUR, MINUTE, SECOND, WEEK, frac_digits, scaled
 
 Reference = date | datetime
 
-_NUM = r"(\d+(?:[.,]\d+)?)"
+_NUM = r"([0-9]+(?:[.,][0-9]+)?)"
 _SHAPE = re.compile(
     rf"(?P<sign>[-+]?)P(?:(?P<W>{_NUM})W|(?:(?P<Y>{_NUM})Y)?(?:(?P<M>{_NUM})M)?(?:(?P<D>{_NUM})D)?"
     rf"(?:T(?:(?P<h>{_NUM})H)?(?:(?P<m>{_NUM})M)?(?:(?P<s>{_NUM})S)?)?)"
@@ -92,7 +92,7 @@ def add_months(day: date, months: int) -> date:
     index = day.year * 12 + day.month - 1 + months
     year, month = divmod(index, 12)
     if not 1 <= year <= 9999:
-        raise AmbiguousDurationError(f"calendar arithmetic leaves the year range: {year}")
+        raise DurationRangeError(f"calendar arithmetic leaves the year range: {year}")
     last = calendar.monthrange(year, month + 1)[1]
     return date(year, month + 1, min(day.day, last))
 
