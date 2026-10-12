@@ -30,8 +30,9 @@ The 0.1.0 functions `parse`, `parse_timedelta` (without `dialect`), `format` and
 | `systemd` | `2 h 30 min`, `1week 2days`, `5` | `2h 30min` | no | `timedelta` |
 | `prometheus` | `1w2d`, `90s`, `324ms` | `2w`, `23d1h` | no | int64 ns |
 
-Each parser rejects anything its reference rejects, and `parse_ns(format_duration(x))`
-equals `x` in every dialect.
+Each parser rejects anything its reference rejects (numbers are ASCII digits only), and
+`parse_ns(format_duration(x))` equals `x` in every dialect for every value inside that
+dialect's range; `format_duration` refuses values outside it.
 
 ### go
 
@@ -56,7 +57,8 @@ Years and months have no fixed length. Without a reference date they raise
 `AmbiguousDurationError`, whose `position` points at the field. With
 `reference=date(...)` or a `datetime`, they are added on the calendar first (the day
 clamps to the end of a shorter month, so `P1M` from 31 January 2024 is 29 days), then the
-fixed fields are added. A leading `-` subtracts the whole span from the reference.
+fixed fields are added. A leading `-` subtracts the whole span from the reference. The
+other dialects have no calendar units and ignore `reference`.
 
 Formatting writes days, hours, minutes and seconds: `PT0S`, `PT1H30M`, `P1DT12H`,
 `PT0.000000001S`, `-P1D`.
@@ -70,7 +72,9 @@ may appear anywhere between tokens, a bare number is seconds and repeated units 
 A year is 365.25 days and a month a twelfth of a year (2629800 seconds), the values in
 `src/basic/time-util.h`. `infinity` is refused, since it is not a finite span.
 
-Formatting follows `format_timespan`: `0`, `1min 30s`, `1y 1us`.
+Formatting uses the unit table of `format_timespan`: `0`, `1min 30s`, `1y 1us`. One
+difference: systemd writes a remainder under a minute in dot notation (`1.5s`), while
+`durospan` keeps whole units (`1s 500ms`); systemd parses both to the same value.
 
 ### prometheus
 
@@ -85,6 +89,8 @@ For text people type. Long and short unit names, case-insensitive, separated by 
 commas or `and`; a leading sign; clock text `H:MM:SS` or `M:SS` with an optional
 fraction. Units: weeks, days, hours, minutes, seconds, milliseconds, microseconds and
 nanoseconds. Months and years raise `AmbiguousDurationError`. A unit may appear once.
+Because names are case-insensitive, `1M` is one minute here, while in systemd `1M` is a
+month: pick the dialect that matches where the text came from.
 
 ## Converting
 

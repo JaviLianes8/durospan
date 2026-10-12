@@ -14,7 +14,8 @@ All notable changes to this project are documented here. The format follows
   its reference grammar (Go's `time.ParseDuration`, ISO 8601 durations, `systemd.time(7)`
   time spans, Prometheus `model.ParseDuration`).
 - `parse_ns` and `parse_seconds`: exact parsing to integer nanoseconds or a `Decimal`.
-- `format_duration`: canonical output per dialect, exact round trip in each one.
+- `format_duration`: canonical output per dialect, exact round trip in each one within
+  the dialect's range.
 - `convert`: re-spell a duration from one dialect into another.
 - `humanize`: short or long rendering with precision, rounding and unit bounds.
 - `find_durations` and `DurationMatch`: locate durations in free text.
