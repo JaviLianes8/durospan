@@ -40,7 +40,10 @@ class _Parser(argparse.ArgumentParser):
 
 def _reference(value: str) -> date:
     try:
-        return datetime.fromisoformat(value) if "T" in value else date.fromisoformat(value)
+        if len(value) == 10:
+            return date.fromisoformat(value)
+        cleaned = value[:-1] + "+00:00" if value.endswith(("Z", "z")) else value
+        return datetime.fromisoformat(cleaned.replace(" ", "T", 1))
     except ValueError as exc:
         raise argparse.ArgumentTypeError(f"not an ISO date: {value!r}") from exc
 
@@ -126,9 +129,10 @@ def _run(args: argparse.Namespace) -> list[str]:
         options = {"long": args.long, "precision": args.precision}
         return [humanize(ns, smallest=args.smallest, largest=args.largest, **options)]
     if args.file == "-":
-        text = sys.stdin.read()
+        # Decode bytes ourselves: UTF-8 on every platform, never a crash on stray bytes.
+        text = sys.stdin.buffer.read().decode("utf-8", errors="replace")
     else:
-        with open(args.file, encoding="utf-8") as handle:
+        with open(args.file, encoding="utf-8", errors="replace") as handle:
             text = handle.read()
     matches = find_durations(text, dialect=args.dialect, reference=args.reference)
     return [f"{m.start}\t{m.end}\t{m.ns}\t{m.text}" for m in matches]

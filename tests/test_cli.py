@@ -45,7 +45,8 @@ def test_humanize(capsys: pytest.CaptureFixture[str]) -> None:
 def test_find_reads_stdin(
     capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr("sys.stdin", io.StringIO("retry in 5 minutes"))
+    stdin = io.TextIOWrapper(io.BytesIO(b"retry in 5 minutes"), encoding="utf-8")
+    monkeypatch.setattr("sys.stdin", stdin)
     assert _run(capsys, "find")[1] == "9\t18\t300000000000\t5 minutes\n"
 
 
@@ -86,3 +87,18 @@ def test_help_lists_runnable_examples() -> None:
     text = build_parser().format_help()
     assert "durospan convert 2h45m30.5s --from go --to iso8601" in text
     assert EPILOG.splitlines()[0] in text
+
+
+def test_find_survives_bytes_that_are_not_utf8(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    log = tmp_path / "binary.log"
+    log.write_bytes(b"\xff\xfe took 2s")
+    code, out, _ = _run(capsys, "find", str(log), "-d", "go")
+    assert code == 0
+    assert out.endswith("\t2000000000\t2s\n")
+
+
+def test_reference_accepts_a_utc_timestamp(capsys: pytest.CaptureFixture[str]) -> None:
+    argv = ["parse", "P1M", "-d", "iso8601", "-r", "2024-01-31 10:00:00Z", "-u", "s"]
+    assert _run(capsys, *argv)[1] == "2505600\n"
