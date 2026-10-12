@@ -1,7 +1,9 @@
 """Golden vectors for the prometheus dialect.
 
 Source: ``model/time_test.go`` in ``prometheus/common`` (``TestParseDuration`` and its
-bad-input cases, Apache-2.0), plus the anchored grammar of ``model.ParseDuration``.
+bad-input cases, Apache-2.0). Entries marked "grammar" are not in that file: they are
+derived from the anchored grammar of ``model.ParseDuration`` (units strictly in
+decreasing order, lower case, no spaces).
 Values are integer nanoseconds; a year is 365 days by Prometheus's definition.
 """
 
@@ -30,6 +32,7 @@ PARSE: list[tuple[str, int, str]] = [
     ("3w", 3 * W, "3w"),
     ("3w2d1h", 3 * W + 2 * D + H, "23d1h"),
     ("10y", 10 * Y, "10y"),
+    # grammar: every unit once, in order
     ("1y2w3d4h5m6s7ms", Y + 2 * W + 3 * D + 4 * H + 5 * M + 6 * S + 7 * MS, ""),
 ]
 
@@ -44,6 +47,7 @@ ERRORS: list[str] = [
     "200y10400w",
     "107675d",
     "2584200h",
+    # grammar: repeated unit, upper case, embedded space
     "1h1h",
     "1H",
     "1h 30m",
