@@ -5,7 +5,10 @@ from __future__ import annotations
 import re
 from datetime import timedelta
 
+from ._api import Dialect, parse_ns
 from ._errors import DurationError
+from ._iso import Reference
+from ._numbers import to_timedelta
 from ._units import SECONDS_BY_UNIT
 
 _TOKEN = re.compile(r"\s*(\d+(?:\.\d+)?)\s*([a-zA-Z]+)\s*")
@@ -21,8 +24,20 @@ def parse(text: str) -> float:
     return _parse_tokens(cleaned)
 
 
-def parse_timedelta(text: str) -> timedelta:
-    """Return ``text`` as a :class:`datetime.timedelta`."""
+def parse_timedelta(
+    text: str, *, dialect: Dialect | None = None, reference: Reference | None = None
+) -> timedelta:
+    """Return ``text`` as a :class:`datetime.timedelta`.
+
+    Without ``dialect`` this reads the 0.1.0 grammar, like :func:`parse`. With a dialect
+    name (see :data:`Dialect`) it parses exactly through integer nanoseconds and raises
+    :class:`DurationRangeError` rather than drop a sub-microsecond remainder.
+
+    >>> parse_timedelta("PT1H30M", dialect="iso8601")
+    datetime.timedelta(seconds=5400)
+    """
+    if dialect is not None:
+        return to_timedelta(parse_ns(text, dialect=dialect, reference=reference))
     try:
         return timedelta(seconds=parse(text))
     except OverflowError as exc:
