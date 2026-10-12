@@ -1,10 +1,12 @@
 """Golden vectors for the iso8601 dialect.
 
-Sources: the duration examples of ISO 8601-1:2019 clause 5.5.2 (``P3Y6M4DT12H30M5S``,
-``P23DT23H``, ``P4Y``, ``PT36H`` against ``P1DT12H``, the decimal comma) and the
-``xs:duration`` lexical examples of W3C XML Schema 1.1 Part 2, section 3.3.6
-(``P1347Y``, ``P1347M``, ``P1Y2MT2H``, ``-P1347M``, and the invalid ``P-1347M`` and
-``P1Y2MT``). Values are integer nanoseconds; calendar values use the reference date.
+Sources: the ``duration`` lexical examples of W3C XML Schema 1.0 Part 2, section
+3.2.6.1 (``P1347Y``, ``P1347M``, ``P1Y2MT2H``, ``P0Y1347M``, ``P0Y1347M0D`` and
+``-P1347M`` allowed; ``P-1347M`` and ``P1Y2MT`` not allowed), copied verbatim. The other
+inputs (``P3Y6M4DT12H30M5S``, ``P23DT23H``, ``P4Y``, ``PT36H`` against ``P1DT12H``, the
+decimal comma) are the commonly quoted ISO 8601 duration examples; the ISO standard text
+itself is not freely available and was not consulted. Values are integer nanoseconds;
+calendar values are computed against the given reference date.
 """
 
 from __future__ import annotations
@@ -43,6 +45,8 @@ CALENDAR: list[tuple[str, date, int]] = [
     ("P1347M", date(2000, 1, 1), (date(2112, 4, 1) - date(2000, 1, 1)).days * D),
     ("P1347Y", date(2000, 1, 1), (date(3347, 1, 1) - date(2000, 1, 1)).days * D),
     ("P1Y2MT2H", date(2000, 1, 1), (date(2001, 3, 1) - date(2000, 1, 1)).days * D + 2 * H),
+    ("P0Y1347M", date(2000, 1, 1), (date(2112, 4, 1) - date(2000, 1, 1)).days * D),
+    ("P0Y1347M0D", date(2000, 1, 1), (date(2112, 4, 1) - date(2000, 1, 1)).days * D),
     ("-P1347M", date(2200, 1, 1), -(date(2200, 1, 1) - date(2087, 10, 1)).days * D),
 ]
 

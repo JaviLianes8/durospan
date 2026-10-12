@@ -1,10 +1,10 @@
 """Prometheus durations, as parsed by ``model.ParseDuration`` in ``prometheus/common``.
 
-The grammar is the anchored regex
-``^(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?$``:
-integers only, largest unit first, each unit at most once, plus the literal ``"0"``.
-A year is 365 days and a week 7 days, by Prometheus's own definition. Values must fit
-an int64 count of nanoseconds, the range of Go's ``time.Duration``.
+The grammar is units ``y w d h m s ms`` with whole numbers, largest unit first, each
+unit at most once, no sign and no spaces, plus the literal ``"0"``. Upstream implements
+this with a hand-written loop; the anchored regex below accepts exactly the same inputs.
+A year is 365 days and a week 7 days, by Prometheus's own definition. Values must fit an
+int64 count of nanoseconds, the range of Go's ``time.Duration``.
 """
 
 from __future__ import annotations

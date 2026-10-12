@@ -78,7 +78,7 @@ difference: systemd writes a remainder under a minute in dot notation (`1.5s`), 
 
 ### prometheus
 
-The anchored regex of `model.ParseDuration`: `y w d h m s ms`, whole numbers, largest
+The grammar of `model.ParseDuration`: `y w d h m s ms`, whole numbers, largest
 unit first, each at most once, and the literal `"0"`. A year is 365 days. Formatting
 matches `Duration.String`, which writes years and weeks only when they divide exactly
 (`14d` becomes `2w`, `3w2d1h` becomes `23d1h`). Values must be whole milliseconds.
@@ -157,7 +157,8 @@ works too.
 ## Sources
 
 - Go: `src/time/format.go` and `src/time/time_test.go` in the Go repository.
-- ISO 8601-1:2019, clause 5.5.2, and W3C XML Schema 1.1 Part 2, `xs:duration`.
+- W3C XML Schema 1.0 Part 2, section 3.2.6.1 (`duration`), and the commonly quoted
+  ISO 8601 duration examples (the ISO text itself is not freely available).
 - systemd: `systemd.time(7)`, `systemd-analyze(1)` and `src/basic/time-util.[ch]`.
 - Prometheus: `model/time.go` and `model/time_test.go` in `prometheus/common`.
 

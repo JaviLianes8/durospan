@@ -1,8 +1,9 @@
 """Golden vectors for the go dialect.
 
 Source: the Go standard library, ``src/time/time_test.go`` (``parseDurationTests``,
-``parseDurationErrorTests`` and ``durationTests``), BSD-3-Clause. Short excerpts; the
-values are written as integer nanoseconds.
+``parseDurationErrorTests`` and ``durationTests``), BSD-3-Clause, copied entry for entry
+with values written as integer nanoseconds. The two error cases written as invalid UTF-8
+byte strings are left out, because a Python ``str`` cannot hold them.
 """
 
 from __future__ import annotations

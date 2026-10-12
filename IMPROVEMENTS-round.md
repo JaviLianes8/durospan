@@ -26,7 +26,7 @@ reference implementation:
 - `systemd`: every unit in `systemd.time(7)` with spaces allowed (`"2 h 30 min"`,
   `"1week 2days"`), bare numbers as seconds, case-sensitive `M` (month) versus `m`
   (minute), month and year at the lengths systemd defines in `time-util.h`.
-- `prometheus`: the anchored `y w d h m s ms` regex of `model.ParseDuration`, integers
+- `prometheus`: the `y w d h m s ms` grammar of `model.ParseDuration`, integers
   only, fixed order, each unit once, `"0"` allowed.
 - `human`: the forgiving superset for people: long names (`"1 hour, 30 minutes"`),
   `and`, sub-second units, clock text and a sign. Months and years are refused as

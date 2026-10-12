@@ -1,9 +1,10 @@
 """Golden vectors for the prometheus dialect.
 
-Source: ``model/time_test.go`` in ``prometheus/common`` (``TestParseDuration`` and its
-bad-input cases, Apache-2.0). Entries marked "grammar" are not in that file: they are
-derived from the anchored grammar of ``model.ParseDuration`` (units strictly in
-decreasing order, lower case, no spaces).
+Source: ``model/time_test.go`` in ``prometheus/common`` (Apache-2.0): every non-negative
+case of ``TestParseDuration`` with its expected ``String()`` output, and every input of
+``TestParseBadDuration``. The last four error inputs (``-1w``, ``1h1h``, ``1H``,
+``1h 30m``) are not in that file; they follow from ``ParseDuration`` in ``model/time.go``
+(no sign, units in descending order and each at most once, lower-case units, no spaces).
 Values are integer nanoseconds; a year is 365 days by Prometheus's definition.
 """
 
@@ -40,14 +41,14 @@ ERRORS: list[str] = [
     "",
     "1",
     "1y1m1d",
-    "-1w",
     "1.5d",
     "d",
     "294y",
     "200y10400w",
     "107675d",
     "2584200h",
-    # grammar: repeated unit, upper case, embedded space
+    # not upstream: sign, repeated unit, upper case, embedded space
+    "-1w",
     "1h1h",
     "1H",
     "1h 30m",
