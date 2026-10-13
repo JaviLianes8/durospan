@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.2]
+
+### Changed
+
+- The prometheus dialect golden vectors are now hand-written, plus a few short vectors
+  cited from the upstream test file with their URL and line, instead of a copy of its
+  whole test table. The hand-written set adds range edges, carries and rejected spellings.
+
 ## [0.2.1]
 
 ### Changed

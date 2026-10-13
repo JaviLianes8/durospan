@@ -163,4 +163,5 @@ works too.
 - Prometheus: `model/time.go` and `model/time_test.go` in `prometheus/common`.
 
 The golden vectors in `tests/golden_*.py` are short excerpts from these sources, each
-with its origin; the go set is mostly hand-written and cites a few Go test vectors.
+with its origin; the go and prometheus sets are mostly hand-written and cite a few
+upstream test vectors with their URL and line.
