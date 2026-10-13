@@ -19,7 +19,7 @@ from ._humanize import Unit, humanize
 from ._parse import parse, parse_timedelta
 from ._style import Style
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "DIALECTS",

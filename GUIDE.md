@@ -162,4 +162,5 @@ works too.
 - systemd: `systemd.time(7)`, `systemd-analyze(1)` and `src/basic/time-util.[ch]`.
 - Prometheus: `model/time.go` and `model/time_test.go` in `prometheus/common`.
 
-The golden vectors in `tests/golden_*.py` are short excerpts from these sources.
+The golden vectors in `tests/golden_*.py` are short excerpts from these sources, each
+with its origin; the go set is mostly hand-written and cites a few Go test vectors.

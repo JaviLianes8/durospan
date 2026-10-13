@@ -1,4 +1,4 @@
-"""The complete promise, checked against vectors taken from the real formats."""
+"""The complete promise, checked against golden vectors for each dialect (see tests/golden_*.py)."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import durospan
 
 
 @pytest.mark.parametrize(("text", "ns"), golden_go.PARSE)
-def test_go_parse_matches_the_go_test_suite(text: str, ns: int) -> None:
+def test_go_parse_follows_parse_duration(text: str, ns: int) -> None:
     assert durospan.parse_ns(text, dialect="go") == ns
 
 
@@ -25,7 +25,7 @@ def test_go_rejects_what_go_rejects(text: str) -> None:
 
 
 @pytest.mark.parametrize(("ns", "text"), golden_go.FORMAT)
-def test_go_format_matches_duration_string(ns: int, text: str) -> None:
+def test_go_format_follows_duration_string(ns: int, text: str) -> None:
     assert durospan.format_duration(ns, dialect="go") == text
     assert durospan.parse_ns(text, dialect="go") == ns
 
