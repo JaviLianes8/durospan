@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1]
+
+### Changed
+
+- The go dialect golden vectors are now hand-written, plus a few short vectors cited from
+  the Go test file with their URL and line, instead of a copy of the whole Go test table.
+- The sdist ships only the sources, tests and docs.
+
 ## [0.2.0] - 2026-10-12
 
 ### Added
